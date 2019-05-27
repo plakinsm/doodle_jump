@@ -1,0 +1,63 @@
+body {
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0;
+	font-size: 16px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	background-color: #343d44;
+}
+
+.game-container {
+	width: 100%;
+	max-width: 500px;
+	position: relative;
+	background-image: url('../images/1.webp');
+	background-size: contain;
+	background-position-y: 0px;
+	overflow: hidden;
+	background-position-y: 100%;
+}
+
+.game-container__wrapper {
+	padding: 70.5% 0;
+}
+
+.hero {
+	overflow: visible;
+	width: 10%;
+	/* background-image: url('../images/hero.png'); */
+	background-repeat: no-repeat;
+	background-size: contain;
+	position: absolute;
+	left: 50%;
+	bottom: 10%;
+	transform: translateX(-50%);
+}
+
+.hero img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+}
+
+.hero__wrapper {
+	padding: 48.75% 0;
+	padding: 75% 0;
+}
+
+.plate {
+	width: 25%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	background-color: green;
+	border-radius: 100px;
+}
+
+.plate__wrapper {
+	padding: 10% 0;
+}
