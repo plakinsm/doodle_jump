@@ -3,8 +3,12 @@ import './styles/index.css';
 window.addEventListener('load', () => {
 	const el = document.querySelector('.hero');
 	const container = document.querySelector('.game-container');
-	new Doodle(el, container)
+	new Doodle(el, container);
 })
+
+Math.randInt = function(min, max) {
+	return Math.floor(min + Math.random() * (max + 1 - min));	
+}
 
 class Doodle {
 	constructor(el, container) {
@@ -21,8 +25,9 @@ class Doodle {
 		this.el.style.bottom = '10%';
 		this.el.style.left = '50%';
 		this.moveBg = false;
-		this.container.style.backgroundPositionY = '0%';
-		// this.moveUp();
+		this.container.style.backgroundPositionY = '67%';
+		this.moveUp();
+		console.log(this.pseudoRandom(5, 0, 100, 10));
 		window.addEventListener('keydown', (e) => {
 			switch (e.key) {
 				case 'ArrowLeft':
@@ -66,6 +71,7 @@ class Doodle {
 		this.containerHeight = this.container.getBoundingClientRect().height;
 		this.startElPos = parseInt(this.el.style.bottom);
 		this.startBgPos = parseInt(this.container.style.backgroundPositionY);
+		this.plateConstructor(this.startBgPos);
 		this.startTime = performance.now();
 		requestAnimationFrame(this.animateUp);
 	}
@@ -80,6 +86,18 @@ class Doodle {
 		let delta = this.timingFunctionUp(time) * this.jumpSize;
 		if (this.moveBg) {
 			let value = this.startBgPos + delta - this.bgDelta;
+			let plateDelta = value - parseInt(this.container.style.backgroundPositionY);
+			let i = 0;
+			while (i < this.plates.length) {
+				const item = this.plates[i];
+				item.style.top = parseInt(item.style.top) + plateDelta + '%';
+				if (parseInt(item.style.top) > 100) {
+					this.plates.splice(i, 1);
+					item.remove();
+				} else {
+					i++;
+				}
+			}
 			this.plateConstructor(value);
 			this.container.style.backgroundPositionY = value + '%';
 		} else {
@@ -127,10 +145,9 @@ class Doodle {
 
 		let delta = this.timingFunctionDown(time) * this.jumpSize;
 		this.el.style.bottom = (this.startElPos - delta) + '%';
-		if (this.startElPos - delta > 20) {
+		this.checkTouch();
+		if (this.isFalling) {
 			requestAnimationFrame(this.animateDown);
-		} else {
-			this.moveUp();
 		}
 	}
 
@@ -195,8 +212,18 @@ class Doodle {
 		if (this.plateHeight * 100 > height) {
 			return;
 		}
+		console.log('create');
 		this.plateHeight += 1;
-		const plate = this.createPlate();
+		const randomLeft = this.pseudoRandom(4, 0, 100, 10);
+		const randomTop = this.pseudoRandom(4, 0, 100, 10);
+		for (let i = 0; i < 4; i++) {
+			const plate = this.createPlate();
+			plate.style.left = randomLeft[i] + '%';
+			plate.style.top = -100 + randomTop[i] + '%';
+			this.plates.push(plate);
+			this.container.append(plate);
+		}
+
 	}
 
 	createPlate = () => {
@@ -208,4 +235,34 @@ class Doodle {
 		return plate;
 	}
 
+	pseudoRandom = (n, min, max, determinant) => {
+		const variables = [];
+		const delta = (max - min) / determinant;
+		for (let i = min; i < max; i += determinant) {
+			variables.push(i);
+		}
+		const res = [];
+		
+		for (let i = 0; i < n; i++) {
+			
+			let x = Math.randInt(0, variables.length - 1);
+			let value = variables[x];
+			variables.splice(x, 1);
+			value += Math.randInt(0, delta);
+			res.push(value);
+		}
+		return res;
+	}
+
+	checkTouch = () => {
+		const heroRect = this.el.getBoundingClientRect();
+		this.plates.forEach((item) => {
+			const plateRect = item.getBoundingClientRect();
+			if (heroRect.left - plateRect.left < plateRect.width && plateRect.left - heroRect.left < heroRect.width) {
+				if (plateRect.top - heroRect.top < heroRect.height && plateRect.top - heroRect.top > heroRect.height - plateRect.height) {
+					this.moveUp();
+				}
+			}
+		})
+	}
 }
